@@ -5,30 +5,53 @@ import Container from '@components/Container';
 import Map from '@components/Map';
 import Button from '@components/Button';
 import styles from '@styles/Home.module.scss';
-import { useState, useEffect } from 'react'; // Importando useState e useEffect
+import { useState, useEffect } from 'react';
 
-const DEFAULT_CENTER = [-22.917939, -43.338957]
+const DEFAULT_CENTER = [-22.4651, -43.4655];
+const VAN_UPDATE_INTERVAL = 5000; // 5 segundos
 
 export default function Home() {
   const [location, setLocation] = useState({
     center: DEFAULT_CENTER,
-    markerPosition: DEFAULT_CENTER 
+    markerPosition: DEFAULT_CENTER,
+    vanPosition: DEFAULT_CENTER
   });
 
   useEffect(() => {
+    // Obtém localização do usuário
     const watchId = navigator.geolocation.watchPosition(
       (position) => {
-        setLocation({
+        setLocation((prevState) => ({
+          ...prevState,
           center: [position.coords.latitude, position.coords.longitude],
           markerPosition: [position.coords.latitude, position.coords.longitude]
-        });
+        }));
       },
       (error) => console.error('Erro ao obter localização:', error)
     );
 
-    // Cleanup do watchPosition quando o componente for desmontado
-    return () => navigator.geolocation.clearWatch(watchId);
-  }, []); // Executa o useEffect apenas na montagem
+    // Simula atualização da localização da van
+    const vanIntervalId = setInterval(() => {
+      setLocation((prevState) => ({
+        ...prevState,
+        vanPosition: simulateVanMovement(prevState.vanPosition)
+      }));
+    }, VAN_UPDATE_INTERVAL);
+
+    // Cleanup 
+    return () => {
+      navigator.geolocation.clearWatch(watchId);
+      clearInterval(vanIntervalId);
+    };
+  }, []); 
+
+  // Função para simular um movimento aleatório da van 
+  function simulateVanMovement(currentVanPosition) {
+    const [lat, lng] = currentVanPosition;
+    const latDelta = (Math.random() - 0.5) * 0.01; 
+    const lngDelta = (Math.random() - 0.5) * 0.01; 
+    return [lat + latDelta, lng + lngDelta];
+  }
 
   return (
     <Layout>
@@ -52,15 +75,15 @@ export default function Home() {
                   attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
                 />
                 <Marker position={location.markerPosition}> 
-                  <Popup>
-                    Você está aqui!
-                  </Popup>
+                  <Popup>Você está aqui!</Popup>
+                </Marker>
+
+                <Marker position={location.vanPosition}> 
+                  <Popup>A van está aqui.</Popup>
                 </Marker>
               </>
             )}
           </Map>
-
-          {/* Resto do conteúdo da página ... */}
         </Container>
       </Section>
     </Layout>
