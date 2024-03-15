@@ -34,7 +34,7 @@ export default function Home() {
     <Layout>
       <Head>
         <title>Teste de localização</title>
-        <meta name="description" content="Create mapping apps with Next.js Leaflet Starter" />
+        <meta name="description" content="Teste de fazer um app de localização de veículos" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
