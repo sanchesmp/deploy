@@ -6,13 +6,16 @@ import Map from '@components/Map';
 import Button from '@components/Button';
 import styles from '@styles/Home.module.scss';
 import { useState, useEffect } from 'react';
-import { PrismaClient } from "@prisma/client";
+import { createClient } from '@supabase/supabase-js';
+import { useSupabase } from 'use-supabase';
 
 const DEFAULT_CENTER = [-22.4651, -43.4655];
 const VAN_UPDATE_INTERVAL = 5000; // 5 segundos
-const prisma = new PrismaClient();
+const apiHost = "52.86.70.121:3000";
+
 
 export default function Home() {
+  const supabase = useSupabase();
   const [location, setLocation] = useState({
     center: DEFAULT_CENTER,
     markerPosition: DEFAULT_CENTER,
@@ -33,12 +36,35 @@ export default function Home() {
     );
 
     // Simula atualização da localização da van
-    const vanIntervalId = setInterval(() => {
-      setLocation((prevState) => ({
-        ...prevState,
-        vanPosition: simulateVanMovement(prevState.vanPosition)
-      }));
-    }, VAN_UPDATE_INTERVAL);
+    const vanIntervalId = setInterval(async () => {
+      try {
+          const url = `http://${apiHost}/veiculo/atualizar-localizacao`; // Rota para a solicitação POST
+          const jsonData = { placa: "123",
+          "posicaoAtual": {
+            "latitude": location.center[0].toString(),
+            "longitude": location.center[1].toString(),
+          }
+        }; // JSON fornecido como parâmetro
+  
+          const response = await fetch(url, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(jsonData)
+          });
+  
+          const data = await response.json();
+          console.log(data);
+          setLocation((prevState) => ({
+              ...prevState,
+              vanPosition: [parseFloat(data.latitude), parseFloat(data.longitude)]
+          }));
+      } catch (error) {
+          console.error('Erro ao obter localização da van:', error);
+      }
+  }, VAN_UPDATE_INTERVAL);
+  
 
     // Cleanup 
     return () => {
@@ -46,29 +72,6 @@ export default function Home() {
       clearInterval(vanIntervalId);
     };
   }, []); 
-
-  // Função para simular um movimento aleatório da van 
-  function simulateVanMovement(currentVanPosition) {
-    const [lat, lng] = currentVanPosition;
-    const latDelta = (Math.random() - 0.5) * 0.01; 
-    const lngDelta = (Math.random() - 0.5) * 0.01; 
-    return [lat + latDelta, lng + lngDelta];
-  }
-
-  async function salvardadosvan(veiculo, currentVanPosition) {
-    const van = await prisma.veiculo.update({
-      where: {
-        placa: veiculo.placa // Identifica o veículo pela placa
-      },
-      data: {
-        latitude: currentVanPosition.latitude,
-        longitude: currentVanPosition.longitude
-      }
-    });
-  
-    return van; // Retorna o objeto do veículo atualizado 
-  }
-  
 
   return (
     <Layout>
@@ -106,4 +109,3 @@ export default function Home() {
     </Layout>
   )
 }
-
