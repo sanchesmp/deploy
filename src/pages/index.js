@@ -6,9 +6,11 @@ import Map from '@components/Map';
 import Button from '@components/Button';
 import styles from '@styles/Home.module.scss';
 import { useState, useEffect } from 'react';
+import { PrismaClient } from "@prisma/client";
 
 const DEFAULT_CENTER = [-22.4651, -43.4655];
 const VAN_UPDATE_INTERVAL = 5000; // 5 segundos
+const prisma = new PrismaClient();
 
 export default function Home() {
   const [location, setLocation] = useState({
@@ -52,6 +54,21 @@ export default function Home() {
     const lngDelta = (Math.random() - 0.5) * 0.01; 
     return [lat + latDelta, lng + lngDelta];
   }
+
+  async function salvardadosvan(veiculo, currentVanPosition) {
+    const van = await prisma.veiculo.update({
+      where: {
+        placa: veiculo.placa // Identifica o veículo pela placa
+      },
+      data: {
+        latitude: currentVanPosition.latitude,
+        longitude: currentVanPosition.longitude
+      }
+    });
+  
+    return van; // Retorna o objeto do veículo atualizado 
+  }
+  
 
   return (
     <Layout>
