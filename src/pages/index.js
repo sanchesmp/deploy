@@ -11,6 +11,8 @@ import { useSupabase } from 'use-supabase';
 
 const DEFAULT_CENTER = [-22.4651, -43.4655];
 const VAN_UPDATE_INTERVAL = 5000; // 5 segundos
+const apiHost = "http://52.86.70.121:3000";
+
 
 export default function Home() {
   const supabase = useSupabase();
@@ -36,16 +38,28 @@ export default function Home() {
     // Simula atualização da localização da van
     const vanIntervalId = setInterval(async () => {
       try {
-        const response = await fetch(`${process.env.VITE_API_HOST}/api/veiculo/localizacao?placa=123`);
-        const data = await response.json();
-        setLocation((prevState) => ({
-          ...prevState,
-          vanPosition: [parseFloat(data.latitude), parseFloat(data.longitude)]
-        }));
+          const url = `${apiHost}/veiculo/localizar-veiculo`; // Rota para a solicitação POST
+          const jsonData = { placa: "123" }; // JSON fornecido como parâmetro
+  
+          const response = await fetch(url, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(jsonData)
+          });
+  
+          const data = await response.json();
+          console.log(data);
+          setLocation((prevState) => ({
+              ...prevState,
+              vanPosition: [parseFloat(data.latitude), parseFloat(data.longitude)]
+          }));
       } catch (error) {
-        console.error('Erro ao obter localização da van:', error);
+          console.error('Erro ao obter localização da van:', error);
       }
-    }, VAN_UPDATE_INTERVAL);
+  }, VAN_UPDATE_INTERVAL);
+  
 
     // Cleanup 
     return () => {
