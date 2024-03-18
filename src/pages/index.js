@@ -38,8 +38,8 @@ export default function Home() {
     // Simula atualização da localização da van
     const vanIntervalId = setInterval(async () => {
       try {
-          const url = `http://${apiHost}/veiculo/localizar-veiculo`; // Rota para a solicitação POST
-          const jsonData = { placa: "123" }; // JSON fornecido como parâmetro
+        const url = `http://${apiHost}/veiculo/localizar-veiculo`; // Rota para a solicitação POST
+        const jsonData = { placa: "123" }; // JSON fornecido como parâmetro
   
           const response = await fetch(url, {
               method: 'POST',
