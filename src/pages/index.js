@@ -11,7 +11,7 @@ import { useSupabase } from 'use-supabase';
 
 const DEFAULT_CENTER = [-22.4651, -43.4655];
 const VAN_UPDATE_INTERVAL = 5000; // 5 segundos
-const apiHost = "http://52.86.70.121:3000";
+const apiHost = "52.86.70.121:3000";
 
 
 export default function Home() {
@@ -38,7 +38,7 @@ export default function Home() {
     // Simula atualização da localização da van
     const vanIntervalId = setInterval(async () => {
       try {
-          const url = `${apiHost}/veiculo/localizar-veiculo`; // Rota para a solicitação POST
+          const url = `http://${apiHost}/veiculo/localizar-veiculo`; // Rota para a solicitação POST
           const jsonData = { placa: "123" }; // JSON fornecido como parâmetro
   
           const response = await fetch(url, {
