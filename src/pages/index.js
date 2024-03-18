@@ -6,11 +6,14 @@ import Map from '@components/Map';
 import Button from '@components/Button';
 import styles from '@styles/Home.module.scss';
 import { useState, useEffect } from 'react';
+import { createClient } from '@supabase/supabase-js';
+import { useSupabase } from 'use-supabase';
 
 const DEFAULT_CENTER = [-22.4651, -43.4655];
 const VAN_UPDATE_INTERVAL = 5000; // 5 segundos
 
 export default function Home() {
+  const supabase = useSupabase();
   const [location, setLocation] = useState({
     center: DEFAULT_CENTER,
     markerPosition: DEFAULT_CENTER,
@@ -31,11 +34,17 @@ export default function Home() {
     );
 
     // Simula atualização da localização da van
-    const vanIntervalId = setInterval(() => {
-      setLocation((prevState) => ({
-        ...prevState,
-        vanPosition: simulateVanMovement(prevState.vanPosition)
-      }));
+    const vanIntervalId = setInterval(async () => {
+      try {
+        const response = await fetch(`${process.env.VITE_API_HOST}/api/veiculo/localizacao?placa=123`);
+        const data = await response.json();
+        setLocation((prevState) => ({
+          ...prevState,
+          vanPosition: [parseFloat(data.latitude), parseFloat(data.longitude)]
+        }));
+      } catch (error) {
+        console.error('Erro ao obter localização da van:', error);
+      }
     }, VAN_UPDATE_INTERVAL);
 
     // Cleanup 
@@ -44,14 +53,6 @@ export default function Home() {
       clearInterval(vanIntervalId);
     };
   }, []); 
-
-  // Função para simular um movimento aleatório da van 
-  function simulateVanMovement(currentVanPosition) {
-    const [lat, lng] = currentVanPosition;
-    const latDelta = (Math.random() - 0.5) * 0.01; 
-    const lngDelta = (Math.random() - 0.5) * 0.01; 
-    return [lat + latDelta, lng + lngDelta];
-  }
 
   return (
     <Layout>
@@ -89,4 +90,3 @@ export default function Home() {
     </Layout>
   )
 }
-
