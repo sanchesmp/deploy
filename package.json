@@ -5,10 +5,10 @@
   "license": "MIT",
   "author": "Colby Fayock <hello@colbyfayock.com>",
   "scripts": {
-    "dev": "next dev -p 8080",
+    "dev": "next dev -p 8000",
     "build": "next build",
     "export": "next export",
-    "start": "next start -p 8080"
+    "start": "next start -p 8000"
   },
   "repository": {
     "type": "git",
