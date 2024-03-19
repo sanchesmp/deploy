@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
 import { useSupabase } from 'use-supabase';
 
+
 const DEFAULT_CENTER = [-22.4651, -43.4655];
 const VAN_UPDATE_INTERVAL = 5000; // 5 segundos
 const apiHost = "52.86.70.121:3000";

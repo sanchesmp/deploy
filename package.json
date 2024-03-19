@@ -5,10 +5,10 @@
   "license": "MIT",
   "author": "Colby Fayock <hello@colbyfayock.com>",
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p 8080",
     "build": "next build",
     "export": "next export",
-    "start": "next start"
+    "start": "next start -p 8080"
   },
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
     "@supabase/supabase-js": "^2.39.8",
     "copy-webpack-plugin": "^11.0.0",
     "leaflet": "^1.9.4",
+    "leaflet.awesome-markers": "^2.0.5",
     "next": "^14.0.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
